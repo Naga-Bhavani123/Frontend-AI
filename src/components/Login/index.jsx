@@ -9,6 +9,7 @@ export default function Auth() {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState(""); 
     const [loginPage, setChangePage] = useState(true)
+    const [error, setError] = useState("")
 
     const onchangeName = (event) => {
         setName(event.target.value)
@@ -35,13 +36,18 @@ export default function Auth() {
                 email, 
                 password
             }) }
+        
+            console.log(password)
 
         const response = await fetch("http://localhost:5000/auth/login", options)
-        const parsedRes = await response.json()
+         const parsedRes = await response.json()
         console.log(parsedRes)
-        if (parsedRes){
+        if (response.ok){
           Cookie.set("jwt-token", parsedRes.token, {expires: 30})
           navigate("/")
+        }else{
+          setError(parsedRes.msg)
+
         }
 
 
@@ -103,6 +109,7 @@ export default function Auth() {
           <button  type="submit" className="auth-btn">
             Login
           </button>
+          <p>{error}</p>
 
          </form>
          <p className = "switch-text">Don’t have an account?{" "}
