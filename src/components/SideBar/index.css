@@ -5,8 +5,10 @@
   background: #121212;
   color: #f1f1f1;
   font-family: "Segoe UI", sans-serif;
+  transition: all 0.3s ease;
 }
 
+/* Sidebar content */
 .sidebar {
   width: 100%;
   background: #1e1e1e;
@@ -15,6 +17,8 @@
   padding: 1rem;
   gap: 1rem;
   box-shadow: 2px 0 6px rgba(0, 0, 0, 0.6);
+  height: 100%;
+  position: relative;
 }
 
 .sidebar-item {
@@ -29,14 +33,12 @@
   position: relative;
   transition: all 0.2s ease;
 }
-
 .sidebar-item:hover {
   background: #2a2a2a;
   color: #fff;
 }
-
 .sidebar-item.active {
-  background: #00b37e; /* same green */
+  background: #00b37e;
   color: #fff;
   border-left: 4px solid #00b37e;
 }
@@ -64,34 +66,18 @@
   }
 }
 
-.main-content {
-  flex: 1;
-  background: #121212;
-  padding: 20px;
-  font-size: 16px;
-  color: #fff;
-}
-
-.page-text {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 16px;
-}
-
+/* Logo section */
 .logo-section {
   display: flex;
   flex-direction: column;
   border-bottom: 1px solid #2c2c2c;
 }
-
 .app-logo {
   width: 60px;
   height: 60px;
   object-fit: contain;
   border-radius: 10px;
 }
-
 .logo-text {
   color: #00ff85;
   font-size: 18px;
@@ -99,7 +85,7 @@
   letter-spacing: 1px;
 }
 
-/* Popup styles */
+/* Popup */
 .popup-overlay {
   position: fixed;
   top: 0;
@@ -112,7 +98,6 @@
   justify-content: center;
   z-index: 999;
 }
-
 .popup {
   background: #1e1e1e;
   padding: 2rem;
@@ -122,7 +107,6 @@
   text-align: center;
   border: 1px solid #00b37e;
 }
-
 .popup-header {
   display: flex;
   justify-content: space-between;
@@ -130,7 +114,6 @@
   margin-bottom: 1rem;
   color: #fff;
 }
-
 .close-btn {
   cursor: pointer;
   color: #bbb;
@@ -139,7 +122,6 @@
 .close-btn:hover {
   color: #00b37e;
 }
-
 .popup-input {
   width: 100%;
   padding: 10px;
@@ -150,7 +132,6 @@
   color: #fff;
   margin-bottom: 1rem;
 }
-
 .create-btn {
   background: #00b37e;
   color: #fff;
@@ -163,4 +144,67 @@
 }
 .create-btn:hover {
   background: #00d890;
+}
+
+/* ====== HAMBURGER FOR MOBILE ====== */
+.hamburger-container {
+  display: none;
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1100;
+}
+.hamburger-icon {
+  color: #00ff85;
+  cursor: pointer;
+}
+
+/* Sidebar hidden by default on small screens */
+@media (max-width: 768px) {
+  .side-container {
+    position: fixed;
+    top: 0;
+    left: -250px;
+    width: 250px;
+    height: 100vh;
+    background: #1e1e1e;
+    z-index: 1000;
+    transition: left 0.3s ease;
+  }
+
+  .side-container.open {
+    left: 0;
+  }
+
+  .hamburger-container {
+    display: block;
+  }
+
+  .close-hamburger {
+    display: flex;
+    justify-content: flex-end;
+    cursor: pointer;
+    color: #fff;
+  }
+
+  
+
+  .sidebar-item {
+    justify-content: flex-start;
+  }
+
+  .app-logo {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* For medium to extra-large: normal layout */
+@media (min-width: 769px) {
+  .close-hamburger {
+    display: none;
+  }
+  .hamburger-container {
+    display: none;
+  }
 }

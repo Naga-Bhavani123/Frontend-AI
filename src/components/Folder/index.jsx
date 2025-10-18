@@ -11,15 +11,13 @@ export default function ChatRightPanel() {
 
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState([]);
-  const [loading, setLoading] = useState(false); // For assistant typing
+  const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef(null);
 
-  // 🔹 Auto-scroll to bottom on messages update
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
 
-  // 🔹 Fetch initial folder history once
   useEffect(() => {
     const fetchHistory = async () => {
       try {
@@ -41,10 +39,8 @@ export default function ChatRightPanel() {
     fetchHistory();
   }, [id, token]);
 
-  // 🔹 Send new message
   const handleSend = async () => {
     if (!input.trim()) return;
-
     const userMsg = { id: Date.now(), role: "user", text: input };
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
@@ -68,24 +64,19 @@ export default function ChatRightPanel() {
           text: data.answer,
         };
         setMessages((prev) => [...prev, assistantMsg]);
-        const loginMessage = "User not login to google mail I don't have permission to send the email.";
+
+        const loginMessage =
+          "User not login to google mail I don't have permission to send the email.";
 
         if (data.answer === loginMessage) {
-          console.log("hello")
-          // 1️⃣ First display the message on chat screen
-          
-          // 2️⃣ Open Google consent page ONLY AFTER message is rendered
-          // Use a small delay (like 1 second)
           setTimeout(() => {
             const googleAuthUrl = `http://localhost:5000/auth/google/?token=${token}`;
-            window.open(googleAuthUrl);
+            const data = window.open(googleAuthUrl);
+            console.log(data)
           }, 1000);
-
-
         }
-    }
-    }
-    catch (err) {
+      }
+    } catch (err) {
       console.error("Error sending query:", err);
     } finally {
       setLoading(false);
@@ -134,7 +125,6 @@ export default function ChatRightPanel() {
             </div>
           ))}
 
-          {/* Loading indicator */}
           {loading && (
             <div className="message assistant">
               <span className="typing">
@@ -165,7 +155,7 @@ export default function ChatRightPanel() {
               <button
                 className="send-btn"
                 onClick={handleSend}
-                disabled={loading} // prevent spamming
+                disabled={loading}
               >
                 <Send size={18} />
               </button>

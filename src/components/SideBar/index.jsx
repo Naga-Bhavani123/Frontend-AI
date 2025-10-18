@@ -1,7 +1,15 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
-import { Home as HomeIcon, Folder, Archive, User, Send, X } from "lucide-react";
-import Cookie from "js-cookie"
+import {
+  Home as HomeIcon,
+  Folder,
+  Archive,
+  User,
+  Send,
+  X,
+  Menu,
+} from "lucide-react";
+import Cookie from "js-cookie";
 import "./index.css";
 
 function SideBar() {
@@ -10,7 +18,17 @@ function SideBar() {
   const [showTooltip, setShowTooltip] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
   const [folderName, setFolderName] = useState("");
-  const navigate = useNavigate()
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth > 1024);
+
+  const navigate = useNavigate();
+
+  // Update screen size on resize
+  useEffect(() => {
+    const handleResize = () => setIsLargeScreen(window.innerWidth > 1024);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const descriptions = {
     home: "🏠 Welcome to Home Page.",
@@ -20,7 +38,7 @@ function SideBar() {
     gmail: "📧 Sent Gmail will appear here.",
   };
 
-  // Tooltip delay
+  // Handle hover tooltip
   useEffect(() => {
     let timer;
     if (hovered) {
@@ -34,111 +52,122 @@ function SideBar() {
   const handleClick = (name) => {
     setActive(name);
     if (name === "folders") setShowPopup(true);
+    if (sidebarOpen) setSidebarOpen(false);
   };
 
-  const handleCreateFolder =  async () => {
+  const handleCreateFolder = async () => {
     if (folderName.trim() === "") return alert("Enter folder name!");
-    const token = Cookie.get("jwt-token")
+    const token = Cookie.get("jwt-token");
     console.log(token)
     const response = await fetch("http://localhost:5000/folder", {
-      method: "POST", 
+      method: "POST",
       headers: {
-        "Content-Type": "application/json", 
-        Authorization: `Bearer ${token}` 
-      }, 
-      body: JSON.stringify({
-        title: folderName
-      })
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ title: folderName }),
+    });
 
-    })
-    if (response.ok){
-      
-      const idData = await response.json()
-      navigate(`folder/${idData.folderId}`)
+    if (response.ok) {
+      const idData = await response.json();
+      navigate(`/folder/${idData.folderId}`);
     }
+
     setFolderName("");
     setShowPopup(false);
   };
 
   return (
-    <div className="side-container">
+    <>
+      {/* Hamburger for mobile */}
+      <div className="hamburger-container">
+        <Menu
+          className="hamburger-icon"
+          size={28}
+          onClick={() => setSidebarOpen(true)}
+        />
+      </div>
+
       {/* Sidebar */}
-      <aside className="sidebar">
+      <div className={`side-container ${sidebarOpen ? "open" : ""}`}>
+        <aside className="sidebar">
+          <div className="close-hamburger">
+            <X size={24} onClick={() => setSidebarOpen(false)} />
+          </div>
+
           <div className="logo-section">
-          <img
-            src="https://res.cloudinary.com/dk9fr18eq/image/upload/v1759730014/ChatGPT_Image_Oct_6_2025_11_02_10_AM_hcszdk.png"
-            alt="FolderFlow Logo"
-            className="app-logo"
-          />
-          <h2 className="logo-text">FolderFlow</h2>
-        </div>
-        {/* HOME */}
-        <div
-          className={`sidebar-item ${active === "home" ? "active" : ""}`}
-          onMouseEnter={() => setHovered("home")}
-          onMouseLeave={() => setHovered(null)}
-          onClick={() => handleClick("home")}
-        >
-          <HomeIcon size={22} /> <span>Home</span>
-          {showTooltip === "home" && (
-            <div className="hover-info">{descriptions.home}</div>
-          )}
-        </div>
+            <img
+              src="https://res.cloudinary.com/dk9fr18eq/image/upload/v1759730014/ChatGPT_Image_Oct_6_2025_11_02_10_AM_hcszdk.png"
+              alt="FolderFlow Logo"
+              className="app-logo"
+            />
+            <h2 className="logo-text">FolderFlow</h2>
+          </div>
 
-        {/* CREATE FOLDER */}
-        <div
-          className={`sidebar-item ${active === "folders" ? "active" : ""}`}
-          onMouseEnter={() => setHovered("folders")}
-          onMouseLeave={() => setHovered(null)}
-          onClick={() => handleClick("folders")}
-        >
-          <Folder size={22} /> <span>Create Folder</span>
-          {showTooltip === "folders" && (
-            <div className="hover-info">{descriptions.folders}</div>
-          )}
-        </div>
+          {/* Sidebar Items */}
+          <div
+            className={`sidebar-item ${active === "home" ? "active" : ""}`}
+            onMouseEnter={() => setHovered("home")}
+            onMouseLeave={() => setHovered(null)}
+            onClick={() => handleClick("home")}
+          >
+            <HomeIcon size={22} /> <span>Home</span>
+            {showTooltip === "home" && isLargeScreen && (
+              <div className="hover-info">{descriptions.home}</div>
+            )}
+          </div>
 
-        {/* OLD FOLDERS */}
-        <div
-          className={`sidebar-item ${active === "oldFolders" ? "active" : ""}`}
-          onMouseEnter={() => setHovered("oldFolders")}
-          onMouseLeave={() => setHovered(null)}
-          onClick={() => handleClick("oldFolders")}
-        >
-          <Archive size={22} /> <span>Old Folders</span>
-          {showTooltip === "oldFolders" && (
-            <div className="hover-info">{descriptions.oldFolders}</div>
-          )}
-        </div>
+          <div
+            className={`sidebar-item ${active === "folders" ? "active" : ""}`}
+            onMouseEnter={() => setHovered("folders")}
+            onMouseLeave={() => setHovered(null)}
+            onClick={() => handleClick("folders")}
+          >
+            <Folder size={22} /> <span>Create Folder</span>
+            {showTooltip === "folders" && isLargeScreen && (
+              <div className="hover-info">{descriptions.folders}</div>
+            )}
+          </div>
 
-        {/* ACCOUNT */}
-        <div
-          className={`sidebar-item ${active === "account" ? "active" : ""}`}
-          onMouseEnter={() => setHovered("account")}
-          onMouseLeave={() => setHovered(null)}
-          onClick={() => handleClick("account")}
-        >
-          <User size={22} /> <span>Account</span>
-          {showTooltip === "account" && (
-            <div className="hover-info">{descriptions.account}</div>
-          )}
-        </div>
+          <div
+            className={`sidebar-item ${active === "oldFolders" ? "active" : ""}`}
+            onMouseEnter={() => setHovered("oldFolders")}
+            onMouseLeave={() => setHovered(null)}
+            onClick={() => handleClick("oldFolders")}
+          >
+            <Archive size={22} /> <span>Old Folders</span>
+            {showTooltip === "oldFolders" && isLargeScreen && (
+              <div className="hover-info">{descriptions.oldFolders}</div>
+            )}
+          </div>
 
-        {/* SENT GMAIL */}
-        <div
-          className={`sidebar-item ${active === "gmail" ? "active" : ""}`}
-          onMouseEnter={() => setHovered("gmail")}
-          onMouseLeave={() => setHovered(null)}
-          onClick={() => handleClick("gmail")}
-        >
-          <Send size={22} /> <span>Sent Gmail</span>
-          {showTooltip === "gmail" && (
-            <div className="hover-info">{descriptions.gmail}</div>
-          )}
-        </div>
-      </aside>
+          <div
+            className={`sidebar-item ${active === "account" ? "active" : ""}`}
+            onMouseEnter={() => setHovered("account")}
+            onMouseLeave={() => setHovered(null)}
+            onClick={() => handleClick("account")}
+          >
+            <User size={22} /> <span>Account</span>
+            {showTooltip === "account" && isLargeScreen && (
+              <div className="hover-info">{descriptions.account}</div>
+            )}
+          </div>
 
-      {/* POPUP MODAL */}
+          <div
+            className={`sidebar-item ${active === "gmail" ? "active" : ""}`}
+            onMouseEnter={() => setHovered("gmail")}
+            onMouseLeave={() => setHovered(null)}
+            onClick={() => handleClick("gmail")}
+          >
+            <Send size={22} /> <span>Sent Gmail</span>
+            {showTooltip === "gmail" && isLargeScreen && (
+              <div className="hover-info">{descriptions.gmail}</div>
+            )}
+          </div>
+        </aside>
+      </div>
+
+      {/* Popup modal */}
       {showPopup && (
         <div className="popup-overlay">
           <div className="popup">
@@ -159,9 +188,8 @@ function SideBar() {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
 
-
-export default SideBar
+export default SideBar;
